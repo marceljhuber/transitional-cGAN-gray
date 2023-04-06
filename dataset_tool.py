@@ -256,7 +256,7 @@ def make_transform(
     def center_crop(width, height, img):
         crop = np.min(img.shape[:2])
         img = img[(img.shape[0] - crop) // 2 : (img.shape[0] + crop) // 2, (img.shape[1] - crop) // 2 : (img.shape[1] + crop) // 2]
-        img = PIL.Image.fromarray(img, 'RGB')
+        img = PIL.Image.fromarray(img, 'L') # Changed RGB to L
         img = img.resize((width, height), resample)
         return np.array(img)
 
@@ -266,7 +266,7 @@ def make_transform(
             return None
 
         img = img[(img.shape[0] - ch) // 2 : (img.shape[0] + ch) // 2]
-        img = PIL.Image.fromarray(img, 'RGB')
+        img = PIL.Image.fromarray(img, 'L') # Changed RGB to L
         img = img.resize((width, height), resample)
         img = np.array(img)
 
@@ -420,6 +420,12 @@ def convert_dataset(
         --transform=center-crop-wide --width 512 --height=384
     """
 
+    # source = "/mnt/84ebe284-c0c2-4b67-bd84-344cdae82803/oct_test"
+    # dest = "/mnt/84ebe284-c0c2-4b67-bd84-344cdae82803/datasets/oct_256.zip"
+    # transform = "center-crop"
+    # width = 256
+    # height = 256
+
     PIL.Image.init() # type: ignore
 
     if dest == '':
@@ -435,7 +441,8 @@ def convert_dataset(
     labels = []
     for idx, image in tqdm(enumerate(input_iter), total=num_files):
 
-        if image['img'].ndim < 3:    # Added by the authors
+        #if image['img'].ndim < 3:    # Added by the authors
+        if image['img'].ndim < 1:    # Added by the authors
             print(image['img'].shape)
             continue
 
@@ -487,4 +494,5 @@ def convert_dataset(
 #----------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    #convert_dataset() # pylint: disable=no-value-for-parameter
     convert_dataset() # pylint: disable=no-value-for-parameter
