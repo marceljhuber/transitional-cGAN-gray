@@ -105,7 +105,6 @@ def generate_images(
             img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
             print("so far so good")
             img = PIL.Image.fromarray(img[0].cpu().numpy()).save(f'{outdir}/proj{idx:02d}.png')
-            #img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/proj{idx:02d}.png')
         return
 
     if seeds is None:
@@ -114,8 +113,8 @@ def generate_images(
     # Labels.
     label = torch.zeros([1, G.c_dim], device=device)
     if G.c_dim != 0:
-        if class_idx is None:
-            ctx.fail('Must specify class label with --class when using a conditional network')
+        # if class_idx is None:
+        #     ctx.fail('Must specify class label with --class when using a conditional network')
         label[:, class_idx] = 1
     else:
         if class_idx is not None:
@@ -130,21 +129,13 @@ def generate_images(
         if (vector_mode):
             # Convert `z` to a NumPy array.
             z_np = z.cpu().numpy()
-
-            # Save the NumPy array to a compressed .npz file
-            # np.save(f'{outdir}/seed{seed:04d}.npy', np.array(z_np))
-
-            # np.save(f'{outdir}/{class_idx}_{seed:04d}.npy', np.array(z_np))
             np.save(os.path.join(os.getcwd(), outdir, f"{class_idx}_{seed:04d}.npy"), np.array(z_np))
         
         img = G(z, label, truncation_psi=truncation_psi, noise_mode=noise_mode)
-        # print(img.shape)
         img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
         from torchvision.utils import save_image
-        i=img.view(256, 256)
-        # print(i.size())
+        i = img.view(256, 256)
 
-        # PIL.Image.fromarray(i.cpu().numpy()).save(f'{outdir}/seed{seed:04d}.png')
         PIL.Image.fromarray(i.cpu().numpy()).save(f'{outdir}/{class_idx}_{seed:04d}.png')
 
 
